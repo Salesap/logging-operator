@@ -26,6 +26,7 @@ var fluentdDefaultTemplate = `
 # include other config files
 @include /fluentd/etc/input.conf
 @include /fluentd/app-config/*
+@include /fluentd/extra-secrets/*.conf
 @include /fluentd/etc/devnull.conf
 @include /fluentd/etc/fluentlog.conf
 `

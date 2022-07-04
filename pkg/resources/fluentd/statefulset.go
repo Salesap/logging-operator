@@ -71,7 +71,7 @@ func (r *Reconciler) statefulsetSpec() *appsv1.StatefulSetSpec {
 
 	containers := []corev1.Container{
 		r.fluentContainer(r.Logging.Spec.FluentdSpec),
-		*newConfigMapReloader(r.Logging.Spec.FluentdSpec),
+		*r.newConfigMapReloader(r.Logging.Spec.FluentdSpec),
 	}
 	if c := r.bufferMetricsSidecarContainer(); c != nil {
 		containers = append(containers, *c)
@@ -162,7 +162,7 @@ func (r *Reconciler) generatePodMeta() metav1.ObjectMeta {
 	return meta
 }
 
-func newConfigMapReloader(spec *v1beta1.FluentdSpec) *corev1.Container {
+func (r *Reconciler) newConfigMapReloader(spec *v1beta1.FluentdSpec) *corev1.Container {
 	return &corev1.Container{
 		Name:            "config-reloader",
 		ImagePullPolicy: corev1.PullPolicy(spec.ConfigReloaderImage.PullPolicy),
@@ -171,6 +171,7 @@ func newConfigMapReloader(spec *v1beta1.FluentdSpec) *corev1.Container {
 		Args: []string{
 			"-volume-dir=/fluentd/etc",
 			"-volume-dir=/fluentd/app-config/",
+			"-volume-dir=/fluentd/extra-secrets/",
 			"-webhook-url=http://127.0.0.1:24444/api/config.reload",
 		},
 		VolumeMounts: []corev1.VolumeMount{
@@ -181,6 +182,11 @@ func newConfigMapReloader(spec *v1beta1.FluentdSpec) *corev1.Container {
 			{
 				Name:      "app-config",
 				MountPath: "/fluentd/app-config/",
+			},
+			{
+				Name:      r.Logging.QualifiedName("extra-secrets"),
+				ReadOnly:  true,
+				MountPath: "/fluentd/extra-secrets/",
 			},
 		},
 	}
