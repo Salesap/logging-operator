@@ -26,7 +26,7 @@ import (
 func (r *Reconciler) drainerJobFor(pvc corev1.PersistentVolumeClaim) (*batchv1.Job, error) {
 	bufVolName := r.Logging.QualifiedName(r.Logging.Spec.FluentdSpec.BufferStorageVolume.PersistentVolumeClaim.PersistentVolumeSource.ClaimName)
 
-	fluentdContainer := fluentContainer(withoutFluentOutLogrotate(r.Logging.Spec.FluentdSpec))
+	fluentdContainer := r.fluentContainer(withoutFluentOutLogrotate(r.Logging.Spec.FluentdSpec))
 	fluentdContainer.VolumeMounts = append(fluentdContainer.VolumeMounts, corev1.VolumeMount{
 		Name:      bufVolName,
 		MountPath: bufferPath,

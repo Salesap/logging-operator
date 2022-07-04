@@ -8,6 +8,10 @@ fullnameOverride: ""
 loggingOperator:
   controlNamespace:
   fluentd: {}
+#   extraSecrets:
+#     - secretName: audit-logs-conf
+#       keyName: s2-audit-logs.conf
+
 #    metrics:
 #      serviceMonitor: false
 #      prometheusAnnotations: false

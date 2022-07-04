@@ -3336,6 +3336,18 @@ spec:
                       - name
                       type: object
                     type: array
+                  extraSecrets:
+                    items:
+                      properties:
+                        keyName:
+                          type: string
+                        secretName:
+                          type: string
+                      required:
+                      - keyName
+                      - secretName
+                      type: object
+                    type: array
                   extraVolumes:
                     items:
                       properties:

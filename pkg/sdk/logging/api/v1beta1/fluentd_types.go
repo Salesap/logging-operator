@@ -46,6 +46,7 @@ type FluentdSpec struct {
 	// +docLink:"volume.KubernetesVolume,https://github.com/banzaicloud/operator-tools/tree/master/docs/types"
 	BufferStorageVolume volume.KubernetesVolume `json:"bufferStorageVolume,omitempty"`
 	ExtraVolumes        []ExtraVolume           `json:"extraVolumes,omitempty"`
+	ExtraSecrets				[]ExtraSecret           `json:"extraSecrets,omitempty"`
 	// Deprecated, use bufferStorageVolume
 	FluentdPvcSpec            *volume.KubernetesVolume          `json:"fluentdPvcSpec,omitempty"`
 	VolumeMountChmod          bool                              `json:"volumeMountChmod,omitempty"`
@@ -119,6 +120,14 @@ func (e *ExtraVolume) ApplyVolumeForPodSpec(spec *corev1.PodSpec) error {
 
 // +kubebuilder:object:generate=true
 
+// ExtraSecret defines the fluentd extra secrets
+type ExtraSecret struct {
+	SecretName    string                   `json:"secretName"`
+	KeyName    		string                   `json:"keyName"`
+}
+
+// +kubebuilder:object:generate=true
+
 // FluentdScaling enables configuring the scaling behaviour of the fluentd statefulset
 type FluentdScaling struct {
 	Replicas            int                `json:"replicas,omitempty"`
@@ -146,4 +155,16 @@ type FluentdDrainConfig struct {
 	Image       ImageSpec         `json:"image,omitempty"`
 	// Container image to use for the fluentd placeholder pod
 	PauseImage ImageSpec `json:"pauseImage,omitempty"`
+}
+
+// VolumeMount defines source and destination folders of a hostPath type pod mount
+type SecretMount struct {
+	// Secret name
+	// +kubebuilder:validation:Pattern=^/.+$
+	SecretName string `json:"secretName"`
+	// Destination Folder
+	// +kubebuilder:validation:Pattern=^/.+$
+	KeyName string `json:"keyName,omitempty"`
+	// Mount Mode
+	//ReadOnly *bool `json:"readOnly,omitempty"`
 }

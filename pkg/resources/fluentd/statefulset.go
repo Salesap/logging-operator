@@ -70,7 +70,7 @@ func (r *Reconciler) statefulsetSpec() *appsv1.StatefulSetSpec {
 	}
 
 	containers := []corev1.Container{
-		fluentContainer(r.Logging.Spec.FluentdSpec),
+		r.fluentContainer(r.Logging.Spec.FluentdSpec),
 		*newConfigMapReloader(r.Logging.Spec.FluentdSpec),
 	}
 	if c := r.bufferMetricsSidecarContainer(); c != nil {
@@ -114,7 +114,7 @@ func (r *Reconciler) statefulsetSpec() *appsv1.StatefulSetSpec {
 	return sts
 }
 
-func fluentContainer(spec *v1beta1.FluentdSpec) corev1.Container {
+func (r *Reconciler) fluentContainer(spec *v1beta1.FluentdSpec) corev1.Container {
 	envVars := append(spec.EnvVars,
 		corev1.EnvVar{Name: "BUFFER_PATH", Value: bufferPath},
 	)
@@ -124,7 +124,7 @@ func fluentContainer(spec *v1beta1.FluentdSpec) corev1.Container {
 		Image:           spec.Image.RepositoryWithTag(),
 		ImagePullPolicy: corev1.PullPolicy(spec.Image.PullPolicy),
 		Ports:           generatePorts(spec),
-		VolumeMounts:    generateVolumeMounts(spec),
+		VolumeMounts:    r.generateVolumeMounts(spec),
 		Resources:       spec.Resources,
 		SecurityContext: &corev1.SecurityContext{
 			RunAsUser:                spec.Security.SecurityContext.RunAsUser,
@@ -218,7 +218,7 @@ func generatePorts(spec *v1beta1.FluentdSpec) []corev1.ContainerPort {
 	return ports
 }
 
-func generateVolumeMounts(spec *v1beta1.FluentdSpec) []corev1.VolumeMount {
+func (r *Reconciler) generateVolumeMounts(spec *v1beta1.FluentdSpec) []corev1.VolumeMount {
 	res := []corev1.VolumeMount{
 		{
 			Name:      "config",
@@ -239,6 +239,15 @@ func generateVolumeMounts(spec *v1beta1.FluentdSpec) []corev1.VolumeMount {
 			MountPath: "/fluentd/tls/",
 		})
 	}
+
+	if spec != nil && spec.ExtraSecrets != nil {
+		res = append(res, corev1.VolumeMount{
+			Name:      r.Logging.QualifiedName("extra-secrets"),
+			ReadOnly:  true,
+			MountPath: "/fluentd/extra-secrets/",
+		})
+	}
+
 	return res
 }
 
@@ -280,6 +289,42 @@ func (r *Reconciler) generateVolume() (v []corev1.Volume) {
 		}
 		v = append(v, tlsRelatedVolume)
 	}
+
+	if r.Logging.Spec.FluentdSpec.ExtraSecrets != nil {
+
+		extraSecretsVolume := corev1.Volume{
+			Name: r.Logging.QualifiedName("extra-secrets"),
+			VolumeSource: corev1.VolumeSource{
+				Projected: &corev1.ProjectedVolumeSource{
+					Sources: []corev1.VolumeProjection{},
+				},
+			},
+		}
+
+		for _, vMnt := range r.Logging.Spec.FluentdSpec.ExtraSecrets {
+			// Combine all extraSecrets in a one projected volume (https://kubernetes.io/docs/concepts/storage/projected-volumes/)
+			// because we need to mount its content to same directory (/fluentd/extra-secrets/)
+			extraSecretsVolume.VolumeSource.Projected.Sources = append(extraSecretsVolume.VolumeSource.Projected.Sources,
+				corev1.VolumeProjection{
+					Secret: &corev1.SecretProjection{
+						LocalObjectReference: corev1.LocalObjectReference{
+							Name: r.Logging.QualifiedName(vMnt.SecretName),
+						},
+
+						Items: []corev1.KeyToPath{
+							{
+								Key: 	vMnt.KeyName,
+								Path: vMnt.KeyName,
+							},
+						},
+					},
+				},
+			)
+
+			v = append(v, extraSecretsVolume);
+		}
+	}
+
 	return
 }
 
