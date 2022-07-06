@@ -326,9 +326,9 @@ func (r *Reconciler) generateVolume() (v []corev1.Volume) {
 					},
 				},
 			)
-
-			v = append(v, extraSecretsVolume);
 		}
+
+		v = append(v, extraSecretsVolume);
 	}
 
 	return
