@@ -52,7 +52,7 @@ jobs:
       - name: Build logging-operator
         uses: docker/build-push-action@v2
         with:
-          tags: ghcr.io/Salesap/logging-operator:${{ steps.imagetag.outputs.value }}
+          tags: ghcr.io/salesap/logging-operator:${{ steps.imagetag.outputs.value }}
           file: Dockerfile
           platforms: ${{ env.PLATFORMS }}
           push: true
