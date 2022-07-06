@@ -14,6 +14,7 @@ RUN apk update \
       wget bzip2 zlib-dev git linux-headers \
       automake autoconf libtool build-base \
       ruby-dev libc6-compat geoip-dev \
+      openssl-dev \
     " \
  && apk add --no-cache --virtual .build-deps \
         build-base \
