@@ -314,7 +314,7 @@ func (r *Reconciler) generateVolume() (v []corev1.Volume) {
 				corev1.VolumeProjection{
 					Secret: &corev1.SecretProjection{
 						LocalObjectReference: corev1.LocalObjectReference{
-							Name: r.Logging.QualifiedName(vMnt.SecretName),
+							Name: vMnt.SecretName,
 						},
 
 						Items: []corev1.KeyToPath{
