@@ -109,3 +109,5 @@ EXPOSE 24224 5140
 USER fluent
 ENTRYPOINT ["tini",  "--", "/bin/entrypoint.sh"]
 CMD ["fluentd"]
+
+# local build: docker build ./fluentd-image/v1.14 -t fluentd:v1.14.6-alpine-5
