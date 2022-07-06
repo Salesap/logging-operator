@@ -3341,10 +3341,13 @@ spec:
                       properties:
                         keyName:
                           type: string
+                        path:
+                          type: string
                         secretName:
                           type: string
                       required:
                       - keyName
+                      - path
                       - secretName
                       type: object
                     type: array

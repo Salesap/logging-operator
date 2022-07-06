@@ -124,6 +124,7 @@ func (e *ExtraVolume) ApplyVolumeForPodSpec(spec *corev1.PodSpec) error {
 type ExtraSecret struct {
 	SecretName    string                   `json:"secretName"`
 	KeyName    		string                   `json:"keyName"`
+	Path       		string                   `json:"path"`
 }
 
 // +kubebuilder:object:generate=true

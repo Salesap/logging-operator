@@ -320,7 +320,7 @@ func (r *Reconciler) generateVolume() (v []corev1.Volume) {
 						Items: []corev1.KeyToPath{
 							{
 								Key: 	vMnt.KeyName,
-								Path: vMnt.KeyName,
+								Path: vMnt.Path,
 							},
 						},
 					},

@@ -8,9 +8,13 @@ fullnameOverride: ""
 loggingOperator:
   controlNamespace:
   fluentd: {}
+# NOTE: only *.conf files ('path' property) from extraSecrets are included by fluentd. All others was skipped.
+# More info: https://github.com/Salesap/logging-operator/blob/216ad2082dbd1c7453a28f5ed659ec03818c29b4/pkg/resources/fluentd/config.go#L29
 #   extraSecrets:
 #     - secretName: audit-logs-conf
 #       keyName: s2-audit-logs.conf
+#       path: s2-audit-logs.conf
+
 
 #    metrics:
 #      serviceMonitor: false
