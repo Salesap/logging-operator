@@ -20,14 +20,10 @@ spec:
   {{- with .Values.allowClusterResourcesFromAllNamespaces }}
   allowClusterResourcesFromAllNamespaces: {{ . }}
   {{- end }}
-  {{- with .Values.skipInvalidResources }}
-  skipInvalidResources: {{ . }}
-  {{- end }}
   {{- if .Values.watchNamespaces }}
   watchNamespaces:
 {{ toYaml .Values.watchNamespaces | indent 4 }}
   {{- end }}
-  clusterDomain: {{ .Values.clusterDomain }}
   controlNamespace: {{ .Values.controlNamespace | default .Release.Namespace }}
   {{- if .Values.defaultFlow }}
   defaultFlow:

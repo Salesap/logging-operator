@@ -24,19 +24,16 @@ import (
 type _hugoKinesisStream interface{} //nolint:deadcode,unused
 
 // +docName:"Kinesis Stream output plugin for Fluentd"
+//  More info at https://github.com/awslabs/aws-fluent-plugin-kinesis#configuration-kinesis_streams
 //
-//	More info at https://github.com/awslabs/aws-fluent-plugin-kinesis#configuration-kinesis_streams
-//
-// ## Example output configurations
+// #### Example output configurations
 // ```yaml
 // spec:
-//
-//	kinesisStream:
-//	  stream_name: example-stream-name
-//	  region: us-east-1
-//	  format:
-//	    type: json
-//
+//   kinesisStream:
+//     stream_name: example-stream-name
+//     region: us-east-1
+//     format:
+//       type: json
 // ```
 type _docKinesisStream interface{} //nolint:deadcode,unused
 
@@ -95,10 +92,6 @@ type KinesisStreamOutputConfig struct {
 	Format *Format `json:"format,omitempty"`
 	// +docLink:"Buffer,../buffer/"
 	Buffer *Buffer `json:"buffer,omitempty"`
-	// The threshold for chunk flush performance check.
-	// Parameter type is float, not time, default: 20.0 (seconds)
-	// If chunk flush takes longer time than this threshold, fluentd logs warning message and increases metric fluentd_output_status_slow_flush_count.
-	SlowFlushLogThreshold string `json:"slow_flush_log_threshold,omitempty"`
 }
 
 // +kubebuilder:object:generate=true

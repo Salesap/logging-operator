@@ -6,12 +6,8 @@ replicaCount: 1
 
 image:
   repository: ghcr.io/banzaicloud/logging-operator
-  tag: 3.17.10
+  tag: 3.17.7
   pullPolicy: IfNotPresent
-
-env: []
-volumes: []
-volumeMounts: []
 
 extraArgs:
   - -enable-leader-election=true

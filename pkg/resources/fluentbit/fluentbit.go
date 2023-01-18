@@ -41,7 +41,6 @@ const (
 	fluentbitPodSecurityPolicyName = "fluentbit"
 	fluentbitServiceName           = "fluentbit"
 	containerName                  = "fluent-bit"
-	defaultBufferVolumeMetricsPort = 9200
 )
 
 func generateLoggingRefLabels(loggingRef string) map[string]string {
@@ -95,10 +94,7 @@ func (r *Reconciler) Reconcile() (*reconcile.Result, error) {
 		r.daemonSet,
 		r.serviceMetrics,
 		r.monitorServiceMetrics,
-		r.serviceBufferMetrics,
-		r.monitorBufferServiceMetrics,
 		r.prometheusRules,
-		r.bufferVolumePrometheusRules,
 	} {
 		o, state, err := factory()
 		if err != nil {

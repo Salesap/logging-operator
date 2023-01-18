@@ -446,7 +446,7 @@ func TestSingleFlowDefaultLoggingRefInvalidOutputRef(t *testing.T) {
 	defer ensureCreated(t, logging)()
 	defer ensureCreated(t, flow)()
 
-	expected := fmt.Sprintf("referenced output test-output-nonexistent not found for flow %s/test-flow", testNamespace)
+	expected := "referenced output not found: test-output-nonexistent"
 	expectError(t, expected, errors)
 }
 

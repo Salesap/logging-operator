@@ -45,7 +45,7 @@ type ClusterOutput struct {
 
 // +kubebuilder:object:generate=true
 
-// ClusterOutputSpec contains Kubernetes spec for ClusterOutput
+// ClusterOutputSpec contains Kubernetes spec for CLusterOutput
 type ClusterOutputSpec struct {
 	OutputSpec        `json:",inline"`
 	EnabledNamespaces []string `json:"enabledNamespaces,omitempty"`

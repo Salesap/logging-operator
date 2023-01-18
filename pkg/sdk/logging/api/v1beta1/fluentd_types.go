@@ -79,10 +79,7 @@ type FluentdSpec struct {
 	// Ignore repeated log lines
 	// +docLink:"more info, https://docs.fluentd.org/deployment/logging#ignore_repeated_log_interval"
 	IgnoreRepeatedLogInterval string `json:"ignoreRepeatedLogInterval,omitempty"`
-	// Allows Time object in buffer's MessagePack serde
-	// +docLink:"more info, https://docs.fluentd.org/deployment/system-config#enable_msgpack_time_support"
-	EnableMsgpackTimeSupport bool   `json:"enableMsgpackTimeSupport,omitempty"`
-	PodPriorityClassName     string `json:"podPriorityClassName,omitempty"`
+	PodPriorityClassName      string `json:"podPriorityClassName,omitempty"`
 	// +kubebuilder:validation:enum=stdout,null
 	FluentLogDestination string `json:"fluentLogDestination,omitempty"`
 	// FluentOutLogrotate sends fluent's stdout to file and rotates it
@@ -91,8 +88,6 @@ type FluentdSpec struct {
 	ServiceAccountOverrides *typeoverride.ServiceAccount `json:"serviceAccount,omitempty"`
 	DNSPolicy               corev1.DNSPolicy             `json:"dnsPolicy,omitempty"`
 	DNSConfig               *corev1.PodDNSConfig         `json:"dnsConfig,omitempty"`
-	ExtraArgs               []string                     `json:"extraArgs,omitempty"`
-	CompressConfigFile      bool                         `json:"compressConfigFile,omitempty"`
 }
 
 // +kubebuilder:object:generate=true
@@ -148,9 +143,7 @@ type FluentdDrainConfig struct {
 	Enabled bool `json:"enabled,omitempty"`
 	// Container image to use for the drain watch sidecar
 	Annotations map[string]string `json:"annotations,omitempty"`
-	// Should persistent volume claims be deleted after draining is done
-	DeleteVolume bool      `json:"deleteVolume,omitempty"`
-	Image        ImageSpec `json:"image,omitempty"`
+	Image       ImageSpec         `json:"image,omitempty"`
 	// Container image to use for the fluentd placeholder pod
 	PauseImage ImageSpec `json:"pauseImage,omitempty"`
 }

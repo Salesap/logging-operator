@@ -20,10 +20,6 @@ import (
 	"github.com/banzaicloud/operator-tools/pkg/volume"
 )
 
-// +name:"NodeAgent"
-// +weight:"200"
-type _hugoNodeAgent interface{} //nolint:deadcode,unused
-
 // +kubebuilder:object:generate=true
 
 type NodeAgent struct {

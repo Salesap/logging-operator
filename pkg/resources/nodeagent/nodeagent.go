@@ -61,7 +61,7 @@ func NodeAgentFluentbitDefaults(userDefined **v1beta1.NodeAgent) (*v1beta1.NodeA
 							Containers: []v1.Container{
 								{
 									Name:            containerName,
-									Image:           "fluent/fluent-bit:1.9.5",
+									Image:           "fluent/fluent-bit:1.9.3",
 									Command:         []string{"/fluent-bit/bin/fluent-bit", "-c", "/fluent-bit/conf_operator/fluent-bit.conf"},
 									ImagePullPolicy: v1.PullIfNotPresent,
 									Resources: v1.ResourceRequirements{
@@ -199,7 +199,7 @@ func NodeAgentFluentbitDefaults(userDefined **v1beta1.NodeAgent) (*v1beta1.NodeA
 var NodeAgentFluentbitWindowsDefaults = &v1beta1.NodeAgent{
 	FluentbitSpec: &v1beta1.NodeAgentFluentbit{
 		FilterKubernetes: v1beta1.FilterKubernetes{
-			KubeURL:       "https://kubernetes.default.svc:443",
+			KubeURL:       "https://kubernetes.default.svc.cluster.local:443",
 			KubeCAFile:    "c:\\var\\run\\secrets\\kubernetes.io\\serviceaccount\\ca.crt",
 			KubeTokenFile: "c:\\var\\run\\secrets\\kubernetes.io\\serviceaccount\\token",
 			KubeTagPrefix: "kubernetes.C.var.log.containers.",
@@ -258,10 +258,11 @@ func (n *nodeAgentInstance) getServiceAccount() string {
 	return n.QualifiedName(defaultServiceAccountName)
 }
 
-//	type DesiredObject struct {
-//		Object runtime.Object
-//		State  reconciler.DesiredState
-//	}
+//
+//type DesiredObject struct {
+//	Object runtime.Object
+//	State  reconciler.DesiredState
+//}
 //
 // Reconciler holds info what resource to reconcile
 type Reconciler struct {
@@ -303,10 +304,6 @@ func (r *Reconciler) Reconcile() (*reconcile.Result, error) {
 			if err != nil {
 				return nil, err
 			}
-
-			// Overwrite Kubernetes endpoint with a ClusterDomain templated value.
-			NodeAgentFluentbitDefaults.FluentbitSpec.FilterKubernetes.KubeURL = fmt.Sprintf("https://kubernetes.default.svc%s:443", r.Logging.ClusterDomainAsSuffix())
-
 		default:
 			err := merge.Merge(NodeAgentFluentbitDefaults, NodeAgentFluentbitLinuxDefaults)
 			if err != nil {

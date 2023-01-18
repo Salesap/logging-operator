@@ -6,7 +6,6 @@ nameOverride: ""
 fullnameOverride: ""
 
 loggingOperator:
-  clusterDomain: cluster.local
   controlNamespace:
   fluentd: {}
 #    metrics:

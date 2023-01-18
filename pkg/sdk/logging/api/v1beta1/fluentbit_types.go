@@ -21,7 +21,6 @@ import (
 
 	"github.com/banzaicloud/operator-tools/pkg/typeoverride"
 	"github.com/banzaicloud/operator-tools/pkg/volume"
-	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 )
 
@@ -78,24 +77,19 @@ type FluentbitSpec struct {
 	DisableKubernetesFilter *bool         `json:"disableKubernetesFilter,omitempty"`
 	BufferStorage           BufferStorage `json:"bufferStorage,omitempty"`
 	// +docLink:"volume.KubernetesVolume,https://github.com/banzaicloud/operator-tools/tree/master/docs/types"
-	BufferStorageVolume     volume.KubernetesVolume        `json:"bufferStorageVolume,omitempty"`
-	BufferVolumeMetrics     *Metrics                       `json:"bufferVolumeMetrics,omitempty"`
-	BufferVolumeImage       ImageSpec                      `json:"bufferVolumeImage,omitempty"`
-	BufferVolumeArgs        []string                       `json:"bufferVolumeArgs,omitempty"`
-	CustomConfigSecret      string                         `json:"customConfigSecret,omitempty"`
-	PodPriorityClassName    string                         `json:"podPriorityClassName,omitempty"`
-	LivenessProbe           *corev1.Probe                  `json:"livenessProbe,omitempty"`
-	LivenessDefaultCheck    bool                           `json:"livenessDefaultCheck,omitempty"`
-	ReadinessProbe          *corev1.Probe                  `json:"readinessProbe,omitempty"`
-	Network                 *FluentbitNetwork              `json:"network,omitempty"`
-	ForwardOptions          *ForwardOptions                `json:"forwardOptions,omitempty"`
-	EnableUpstream          bool                           `json:"enableUpstream,omitempty"`
-	ServiceAccountOverrides *typeoverride.ServiceAccount   `json:"serviceAccount,omitempty"`
-	DNSPolicy               corev1.DNSPolicy               `json:"dnsPolicy,omitempty"`
-	DNSConfig               *corev1.PodDNSConfig           `json:"dnsConfig,omitempty"`
-	HostNetwork             bool                           `json:"HostNetwork,omitempty"`
-	SyslogNGOutput          *FluentbitTCPOutput            `json:"syslogng_output,omitempty"`
-	UpdateStrategy          appsv1.DaemonSetUpdateStrategy `json:"updateStrategy,omitempty"`
+	BufferStorageVolume     volume.KubernetesVolume      `json:"bufferStorageVolume,omitempty"`
+	CustomConfigSecret      string                       `json:"customConfigSecret,omitempty"`
+	PodPriorityClassName    string                       `json:"podPriorityClassName,omitempty"`
+	LivenessProbe           *corev1.Probe                `json:"livenessProbe,omitempty"`
+	LivenessDefaultCheck    bool                         `json:"livenessDefaultCheck,omitempty"`
+	ReadinessProbe          *corev1.Probe                `json:"readinessProbe,omitempty"`
+	Network                 *FluentbitNetwork            `json:"network,omitempty"`
+	ForwardOptions          *ForwardOptions              `json:"forwardOptions,omitempty"`
+	EnableUpstream          bool                         `json:"enableUpstream,omitempty"`
+	ServiceAccountOverrides *typeoverride.ServiceAccount `json:"serviceAccount,omitempty"`
+	DNSPolicy               corev1.DNSPolicy             `json:"dnsPolicy,omitempty"`
+	DNSConfig               *corev1.PodDNSConfig         `json:"dnsConfig,omitempty"`
+	HostNetwork             bool                         `json:"HostNetwork,omitempty"`
 }
 
 // +kubebuilder:object:generate=true
@@ -105,14 +99,6 @@ type FluentbitTLS struct {
 	Enabled    *bool  `json:"enabled"`
 	SecretName string `json:"secretName,omitempty"`
 	SharedKey  string `json:"sharedKey,omitempty"`
-}
-
-// +kubebuilder:object:generate=true
-
-// FluentbitTCPOutput defines the TLS configs
-type FluentbitTCPOutput struct {
-	JsonDateKey    string `json:"json_date_key,omitempty" plugin:"default:ts"`
-	JsonDateFormat string `json:"json_date_format,omitempty" plugin:"default:iso8601"`
 }
 
 // FluentbitNetwork defines network configuration for fluentbit
@@ -190,10 +176,6 @@ type InputTail struct {
 	DB *string `json:"DB,omitempty"`
 	// Set a default synchronization (I/O) method. Values: Extra, Full, Normal, Off. This flag affects how the internal SQLite engine do synchronization to disk, for more details about each option please refer to this section. (default:Full)
 	DBSync string `json:"DB_Sync,omitempty"`
-	// Specify that the database will be accessed only by Fluent Bit. Enabling this feature helps to increase performance when accessing the database but it restrict any external tool to query the content. (default: true)
-	DBLocking *bool `json:"DB.locking,omitempty"`
-	// sets the journal mode for databases (WAL). Enabling WAL provides higher performance. Note that WAL is not compatible with shared network file systems. (default: WAL)
-	DBJournalMode string `json:"DB.journal_mode,omitempty"`
 	// Set a limit of memory that Tail plugin can use when appending data to the Engine. If the limit is reach, it will be paused; when the data is flushed it resumes.
 	MemBufLimit string `json:"Mem_Buf_Limit,omitempty"`
 	// Specify the name of a parser to interpret the entry as a structured message.
@@ -236,8 +218,6 @@ type FilterKubernetes struct {
 	KubeCAPath string `json:"Kube_CA_Path,omitempty"`
 	// Token file  (default:/var/run/secrets/kubernetes.io/serviceaccount/token)
 	KubeTokenFile string `json:"Kube_Token_File,omitempty" plugin:"default:/var/run/secrets/kubernetes.io/serviceaccount/token"`
-	// Token TTL configurable 'time to live' for the K8s token. By default, it is set to 600 seconds. After this time, the token is reloaded from Kube_Token_File or the Kube_Token_Command.  (default:"600")
-	KubeTokenTTL string `json:"Kube_Token_TTL,omitempty" plugin:"default:600"`
 	// When the source records comes from Tail input plugin, this option allows to specify what's the prefix used in Tail configuration. (default:kube.var.log.containers.)
 	KubeTagPrefix string `json:"Kube_Tag_Prefix,omitempty" plugin:"default:kubernetes.var.log.containers"`
 	// When enabled, it checks if the log field content is a JSON string map, if so, it append the map fields as part of the log structure. (default:Off)
@@ -280,8 +260,6 @@ type FilterKubernetes struct {
 	UseKubelet string `json:"Use_Kubelet,omitempty"`
 	// kubelet port using for HTTP request, this only works when Use_Kubelet  set to On (default:10250)
 	KubeletPort string `json:"Kubelet_Port,omitempty"`
-	// Configurable TTL for K8s cached metadata. By default, it is set to 0 which means TTL for cache entries is disabled and cache entries are evicted at random when capacity is reached. In order to enable this option, you should set the number to a time interval. For example, set this value to 60 or 60s and cache entries which have been created more than 60s will be evicted. (default:0)
-	KubeMetaCacheTTL string `json:"Kube_Meta_Cache_TTL,omitempty"`
 }
 
 // FilterAws The AWS Filter Enriches logs with AWS Metadata.

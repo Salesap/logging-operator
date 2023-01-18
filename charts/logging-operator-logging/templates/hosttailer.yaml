@@ -5,10 +5,8 @@ metadata:
   name: {{ .name | default "hosttailer" }}
 spec:
   enableRecreateWorkloadOnImmutableFieldChange: {{ $.Values.enableRecreateWorkloadOnImmutableFieldChange }}
-{{- with .workloadOverrides }}
   workloadOverrides:
-{{ toYaml . | indent 4 }}
-{{- end }}
+    priorityClassName: system-node-critical
 {{- with .containerOverrides }}
   containerOverrides:
 {{- toYaml . | nindent 4 }}

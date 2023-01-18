@@ -257,11 +257,6 @@ func (in *ElasticsearchOutput) DeepCopyInto(out *ElasticsearchOutput) {
 		*out = new(bool)
 		**out = **in
 	}
-	if in.FailOnDetectingEsVersionRetryExceed != nil {
-		in, out := &in.FailOnDetectingEsVersionRetryExceed, &out.FailOnDetectingEsVersionRetryExceed
-		*out = new(bool)
-		**out = **in
-	}
 	if in.ReloadConnections != nil {
 		in, out := &in.ReloadConnections, &out.ReloadConnections
 		*out = new(bool)
@@ -696,11 +691,6 @@ func (in *KafkaOutputConfig) DeepCopyInto(out *KafkaOutputConfig) {
 		for key, val := range *in {
 			(*out)[key] = val
 		}
-	}
-	if in.Keytab != nil {
-		in, out := &in.Keytab, &out.Keytab
-		*out = new(secret.Secret)
-		(*in).DeepCopyInto(*out)
 	}
 	if in.Username != nil {
 		in, out := &in.Username, &out.Username
@@ -1240,11 +1230,6 @@ func (in *OpenSearchOutput) DeepCopyInto(out *OpenSearchOutput) {
 		in, out := &in.Buffer, &out.Buffer
 		*out = new(Buffer)
 		(*in).DeepCopyInto(*out)
-	}
-	if in.DataStreamEnable != nil {
-		in, out := &in.DataStreamEnable, &out.DataStreamEnable
-		*out = new(bool)
-		**out = **in
 	}
 }
 

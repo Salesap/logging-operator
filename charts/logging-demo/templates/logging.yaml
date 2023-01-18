@@ -3,9 +3,7 @@ kind: Logging
 metadata:
   name: {{ include "logging-demo.fullname" . }}
 spec:
-  syslogNG:
-    metrics:
-       path: "/metrics"
+  fluentd:
     {{- if .Values.loggingOperator.tls.enabled }}
     tls:
       enabled: true
@@ -27,5 +25,4 @@ spec:
 {{ toYaml .Values.loggingOperator.fluentbit | indent 4}}
     {{- end}}
 
-  clusterDomain: {{ .Values.loggingOperator.clusterDomain }}
   controlNamespace: {{ .Values.loggingOperator.controlNamespace | default .Release.Namespace }}
