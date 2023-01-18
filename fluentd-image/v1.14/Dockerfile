@@ -52,7 +52,7 @@ RUN apk update \
          fluent-plugin-sumologic_output \
          fluent-plugin-kafka \
          fluent-plugin-geoip \
-         fluent-plugin-label-router \
+#         fluent-plugin-label-router \
          fluent-plugin-tag-normaliser \
          fluent-plugin-grafana-loki \
          fluent-plugin-concat \
@@ -78,10 +78,11 @@ RUN apk update \
  && gem specific_install -l https://github.com/acquia/fluent-plugin-syslog_rfc5424.git \
  && gem specific_install -l https://github.com/banzaicloud/fluent-plugin-gcs.git \
  && gem specific_install -l https://github.com/SumoLogic/sumologic-kubernetes-fluentd.git -d fluent-plugin-kubernetes-metadata-filter \
+ && gem specific_install -l https://github.com/banzaicloud/fluent-plugin-label-router.git -b rwlock \
  && gem specific_install -l https://github.com/SumoLogic/sumologic-kubernetes-fluentd.git -d fluent-plugin-enhance-k8s-metadata \
  && gem specific_install -l https://github.com/SumoLogic/sumologic-kubernetes-fluentd.git -d fluent-plugin-kubernetes-sumologic \
- # https://github.com/SumoLogic/sumologic-kubernetes-fluentd/blob/main/Dockerfile#L27
- && gem specific_install https://github.com/abonas/kubeclient --ref 3267dc3fd02c49e3b19f1210ff7cb84c3b2a4478 \
+ # https://github.com/SumoLogic/sumologic-kubernetes-fluentd/blob/main/Dockerfile#L35
+ && gem specific_install https://github.com/abonas/kubeclient --ref 831e360772c717aab5ca086521c45c86ee51435e \
  && apk del .build-deps $buildDeps \
  && rm -rf /tmp/* /var/tmp/* /usr/lib/ruby/gems/*/cache/*.gem /usr/lib/ruby/gems/2.*/gems/fluentd-*/test
 
