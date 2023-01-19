@@ -61,6 +61,8 @@ type LoggingSpec struct {
 	GlobalFilters []Filter `json:"globalFilters,omitempty"`
 	// Limit namespaces to watch Flow and Output custom resources.
 	WatchNamespaces []string `json:"watchNamespaces,omitempty"`
+	// Cluster domain name to be used when templating URLs to services (default: "cluster.local").
+	ClusterDomain *string `json:"clusterDomain,omitempty"`
 	// Namespace for cluster wide configuration resources like CLusterFlow and ClusterOutput.
 	// This should be a protected namespace from regular users.
 	// Resources like fluentbit and fluentd will run in this namespace as well.
@@ -117,6 +119,9 @@ type DefaultFlowSpec struct {
 const (
 	DefaultFluentbitImageRepository             = "fluent/fluent-bit"
 	DefaultFluentbitImageTag                    = "1.9.5"
+	DefaultFluentbitBufferVolumeImageRepository = "ghcr.io/banzaicloud/node-exporter"
+	DefaultFluentbitBufferVolumeImageTag        = "v0.2.0"
+	DefaultFluentbitBufferStorageVolumeName     = "fluentbit-buffer"
 	DefaultFluentdImageRepository               = "ghcr.io/banzaicloud/fluentd"
 	DefaultFluentdImageTag                      = "v1.14.6-alpine-5"
 	DefaultFluentdBufferStorageVolumeName       = "fluentd-buffer"
@@ -126,14 +131,17 @@ const (
 	DefaultFluentdDrainPauseImageTag            = "latest"
 	DefaultFluentdVolumeModeImageRepository     = "busybox"
 	DefaultFluentdVolumeModeImageTag            = "latest"
-	DefaultFluentdConfigReloaderImageRepository = "jimmidyson/configmap-reload"
-	DefaultFluentdConfigReloaderImageTag        = "v0.4.0"
+	DefaultFluentdConfigReloaderImageRepository = "ghcr.io/banzaicloud/config-reloader"
+	DefaultFluentdConfigReloaderImageTag        = "0.0.1"
 	DefaultFluentdBufferVolumeImageRepository   = "ghcr.io/banzaicloud/custom-runner"
 	DefaultFluentdBufferVolumeImageTag          = "0.1.0"
 )
 
 // SetDefaults fills empty attributes
 func (l *Logging) SetDefaults() error {
+	if l.Spec.ClusterDomain == nil {
+		l.Spec.ClusterDomain = util.StringPointer("cluster.local")
+	}
 	if !l.Spec.FlowConfigCheckDisabled && l.Status.ConfigCheckResults == nil {
 		l.Status.ConfigCheckResults = make(map[string]bool)
 	}
@@ -405,6 +413,9 @@ func (l *Logging) SetDefaults() error {
 		if l.Spec.FluentbitSpec.InputTail.DB == nil {
 			l.Spec.FluentbitSpec.InputTail.DB = util.StringPointer("/tail-db/tail-containers-state.db")
 		}
+		if l.Spec.FluentbitSpec.InputTail.DBLocking == nil {
+			l.Spec.FluentbitSpec.InputTail.DBLocking = util.BoolPointer(true)
+		}
 		if l.Spec.FluentbitSpec.InputTail.MemBufLimit == "" {
 			l.Spec.FluentbitSpec.InputTail.MemBufLimit = "5MB"
 		}
@@ -419,6 +430,15 @@ func (l *Logging) SetDefaults() error {
 		}
 		if l.Spec.FluentbitSpec.Security.RoleBasedAccessControlCreate == nil {
 			l.Spec.FluentbitSpec.Security.RoleBasedAccessControlCreate = util.BoolPointer(true)
+		}
+		if l.Spec.FluentbitSpec.BufferVolumeImage.Repository == "" {
+			l.Spec.FluentbitSpec.BufferVolumeImage.Repository = DefaultFluentbitBufferVolumeImageRepository
+		}
+		if l.Spec.FluentbitSpec.BufferVolumeImage.Tag == "" {
+			l.Spec.FluentbitSpec.BufferVolumeImage.Tag = DefaultFluentbitBufferVolumeImageTag
+		}
+		if l.Spec.FluentbitSpec.BufferVolumeImage.PullPolicy == "" {
+			l.Spec.FluentbitSpec.BufferVolumeImage.PullPolicy = "IfNotPresent"
 		}
 		if l.Spec.FluentbitSpec.Security.SecurityContext == nil {
 			l.Spec.FluentbitSpec.Security.SecurityContext = &v1.SecurityContext{}
@@ -544,6 +564,16 @@ func (l *Logging) SetDefaultsOnCopy() (*Logging, error) {
 // QualifiedName is the "logging-resource" name combined
 func (l *Logging) QualifiedName(name string) string {
 	return fmt.Sprintf("%s-%s", l.Name, name)
+}
+
+// ClusterDomainAsSuffix formats the cluster domain as a suffix, e.g.:
+// .Spec.ClusterDomain == "", returns ""
+// .Spec.ClusterDomain == "cluster.local", returns ".cluster.local"
+func (l *Logging) ClusterDomainAsSuffix() string {
+	if l.Spec.ClusterDomain == nil || *l.Spec.ClusterDomain == "" {
+		return ""
+	}
+	return fmt.Sprintf(".%s", *l.Spec.ClusterDomain)
 }
 
 func init() {

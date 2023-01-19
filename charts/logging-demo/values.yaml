@@ -6,6 +6,7 @@ nameOverride: ""
 fullnameOverride: ""
 
 loggingOperator:
+  clusterDomain: cluster.local
   controlNamespace:
   fluentd: {}
 # NOTE: only *.conf files ('path' property) from extraSecrets are included by fluentd. All others was skipped.
