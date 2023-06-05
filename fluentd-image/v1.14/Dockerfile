@@ -43,7 +43,6 @@ RUN apk update \
  && find /usr/lib/ruby/gems/2.*/gems/fluent-plugin-detect-exceptions-* -type f -print0 | xargs -0 chmod 644 \
  && gem install \
          specific_install \
-         fluent-plugin-remote-syslog \
          fluent-plugin-webhdfs \
          fluent-plugin-prometheus \
          fluent-plugin-s3 \
@@ -88,6 +87,9 @@ RUN apk update \
  && apk del .build-deps $buildDeps \
  && rm -rf /tmp/* /var/tmp/* /usr/lib/ruby/gems/*/cache/*.gem /usr/lib/ruby/gems/2.*/gems/fluentd-*/test
 
+# RangerX: small security patch
+RUN chmod -R o-w /usr/lib/ruby/gems
+
 RUN addgroup -S fluent && adduser -S -G fluent fluent \
     # for log storage (maybe shared with host)
     && mkdir -p /fluentd/log \
@@ -101,6 +103,14 @@ COPY fluent.conf /fluentd/etc/
 COPY entrypoint.sh /bin/
 COPY healthy.sh /bin/
 
+# hack from RangerX: we need copy some plugins to /fluentd/hack-plugins as on https://github.com/openshift/origin-aggregated-logging/issues/604#issuecomment-324724857
+# RUN mkdir -p /fluentd/hack-plugins \
+#     && cd /usr/lib/ruby/gems/2.7.0/gems/fluent-plugin-remote-syslog-1.1 \
+#     && ls -la . \
+#     && gem build fluent-plugin-remote-syslog.gemspec \
+#     && td-agent-gem install fluent-plugin-remote-syslog-*.gem \
+#     #&& cp -r /usr/lib/ruby/gems/2.7.0/gems/* /fluentd/hack-plugins/ \
+#     && ls -la /fluentd/hack-plugins
 
 ENV FLUENTD_CONF="fluent.conf"
 ENV RUBYLIB="/usr/lib/ruby/gems/2.7.0/gems/resolv-0.2.1/lib"
